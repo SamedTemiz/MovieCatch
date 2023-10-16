@@ -35,6 +35,9 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+    buildFeatures{
+        buildConfig = true
+    }
 }
 
 dependencies {
@@ -61,13 +64,11 @@ dependencies {
     // Glide
     implementation("com.github.bumptech.glide:glide:4.12.0")
 
-    // Navigation Bar (Custom)
-    implementation("com.github.ismaeldivita:chip-navigation-bar:1.4.0")
-
     // Kotlin Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1")
 
+    // Broadcast
     implementation("androidx.localbroadcastmanager:localbroadcastmanager:1.1.0")
 
     // Room DB
