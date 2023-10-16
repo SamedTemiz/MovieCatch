@@ -11,17 +11,27 @@ import javax.inject.Inject
 class HomepageViewModel @Inject constructor(private val repository: RetrofitRepository): ViewModel(){
 
     var popularMovieList: MutableLiveData<Movie>
+    var recentMovieList: MutableLiveData<Movie>
 
     init{
         popularMovieList = MutableLiveData()
+        recentMovieList = MutableLiveData()
     }
 
-    fun getObserverLiveData() : MutableLiveData<Movie>{
-        return popularMovieList
+    fun getObserverLiveData(isPopular: Boolean = false) : MutableLiveData<Movie>{
+        if(isPopular){
+            return popularMovieList
+        }
+
+        return recentMovieList
     }
 
-    fun loadPopularData(page: String){
-        repository.getPopularMovies(page, popularMovieList)
+    fun loadData(page: String, isPopular: Boolean){
+        if(isPopular){
+            repository.getPopularMovies(page, popularMovieList)
+        }
+
+        repository.getRecentMovies(page, recentMovieList)
     }
 
 }
