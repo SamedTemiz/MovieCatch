@@ -1,13 +1,18 @@
-package com.samedtemiz.moviecatch
+package com.samedtemiz.moviecatch.ui.fragments.home.pages
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.samedtemiz.moviecatch.R
 import com.samedtemiz.moviecatch.adapter.MovieAdapter
 import com.samedtemiz.moviecatch.adapter.RecentMovieAdapter
+import com.samedtemiz.moviecatch.databinding.FragmentHomeBinding
 import com.samedtemiz.moviecatch.models.Movie
 import com.samedtemiz.moviecatch.viewmodel.HomepageViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -18,7 +23,10 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
+class HomeFragment : Fragment() {
+
+    private var _binding: FragmentHomeBinding? = null
+    private val binding get() = _binding!!
 
     private lateinit var movieAdapter: MovieAdapter
     private lateinit var recentMovieAdapter: RecentMovieAdapter
@@ -27,36 +35,44 @@ class MainActivity : AppCompatActivity() {
         ViewModelProvider(this, defaultViewModelProviderFactory).get(HomepageViewModel::class.java)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        _binding = FragmentHomeBinding.inflate(inflater, container, false)
+        val view = binding.root
 
         initRecyclerView()
-        viewModel.getObserverLiveData(true).observe(this, object: Observer<Movie>{
+        viewModel.getObserverLiveData(true).observe(this, object : Observer<Movie> {
             override fun onChanged(value: Movie) {
-                if(value != null){
-                    movieAdapter.setList(value.results)
-                }
+                movieAdapter.setList(value.results)
             }
 
         })
 
-        viewModel.getObserverLiveData(false).observe(this, object: Observer<Movie>{
+        viewModel.getObserverLiveData(false).observe(this, object : Observer<Movie> {
             override fun onChanged(value: Movie) {
-                if(value != null){
-                    recentMovieAdapter.setList(value.results)
-                }
+                recentMovieAdapter.setList(value.results)
             }
 
         })
 
         fetchMovies()
+
+        return view
     }
 
-    fun initRecyclerView(){
-        val lmHorizontal = LinearLayoutManager(applicationContext, LinearLayoutManager.HORIZONTAL, false)
-        val lmVertical = LinearLayoutManager(applicationContext, LinearLayoutManager.VERTICAL, false)
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    fun initRecyclerView() {
+        val lmHorizontal =
+            LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        val lmVertical =
+            LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
 
         val recycler_recentMovie = findViewById<RecyclerView>(R.id.recycler_recentMovie)
         val recycler_populerMovie = findViewById<RecyclerView>(R.id.recycler_popularMovie)
@@ -70,15 +86,15 @@ class MainActivity : AppCompatActivity() {
         recycler_recentMovie.adapter = recentMovieAdapter
     }
 
-    fun fetchMovies(){
+    fun fetchMovies() {
 
         CoroutineScope(Dispatchers.IO).launch {
 
-            val job1 : Deferred<Unit> = async {
+            val job1: Deferred<Unit> = async {
                 viewModel.loadData("1", true)
             }
 
-            val job2 : Deferred<Unit> = async {
+            val job2: Deferred<Unit> = async {
                 viewModel.loadData("1", false)
             }
 
@@ -87,4 +103,5 @@ class MainActivity : AppCompatActivity() {
         }
 
     }
+
 }
